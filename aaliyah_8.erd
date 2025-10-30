@@ -1,0 +1,85 @@
+erdiagram RC_Models
+
+entity Customer {
+  cus_id key
+  cus_name
+  cus_status // potential, interested, previous
+  cus_address
+  cus_email
+  credit_card
+}
+
+entity Invoice {
+  inv_id key
+  cus_id
+  shipping_charge
+  date_ordered
+  date_shipped
+}
+
+entity Line {
+  line_id key
+  inv_id
+  product_id
+  quantity
+  total_line_price
+}
+
+entity Product {
+  product_id key
+  vendor_id
+  product_name
+  category // aircraft, ships, cars, decals
+  minimum_quantity
+  price
+  quant_on_hand
+  scale // 1/144 to 1/32
+}
+
+entity Vendor {
+  vendor_id key
+  vendor_name
+  vendor_website
+}
+
+entity Order {
+  order_id key
+  vendor_id
+  product_id
+  quantity
+  price_per_unit
+  total_order_line
+}
+
+// Relationships
+relationship Generates {
+  Customer[1] -> Invoice[0..*]
+}
+
+relationship Contains {
+  Invoice[1] -> Line[1..*]
+}
+
+relationship References {
+  Line[*] -> Product[1]
+}
+
+relationship Supplies {
+  Vendor[1] -> Product[*]
+}
+
+relationship PlacedWith {
+  Order[*] -> Vendor[1]
+}
+
+relationship OrdersProduct {
+  Order[*] -> Product[1]
+}
+
+// Notes:
+// 1. Customer status tracks if they are potential, interested, or previous customer
+// 2. Orders are automatically placed when product inventory reaches minimum quantity
+// 3. Products not sold within 4 weeks are scrapped
+// 4. Back orders are not charged until shipped
+// 5. All orders include shipping charges
+// 6. Credit card transactions are handled through CC Bank (external system)
